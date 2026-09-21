@@ -1,0 +1,37 @@
+{
+  "name": "jev-chess-engine",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
+    "smoke": "node --env-file=.env.local --import tsx scripts/smoke.mts",
+    "selfplay": "node --env-file=.env.local --import tsx scripts/selfplay.mts"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "^2.1.0",
+    "@upstash/redis": "^1.38.4",
+    "chess.js": "^1.4.0",
+    "next": "16.3.5",
+    "react": "19.2.8",
+    "react-chessboard": "^5.12.1",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.5",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.13",
+    "typescript": "^5",
+    "vitest": "^5.0.1"
+  },
+  "packageManager": "pnpm@12.4.2"
+}
