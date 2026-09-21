@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { listCandidates } from '../candidates';
 import { buildChoiceRequest, decideFromChoice } from './choice';
 import { buildPositionRequest, decideFromPosition } from './position';
+import { buildTacticalRequest } from './tactical';
 
 const chess = new Chess();
 const candidates = listCandidates(chess);
@@ -50,5 +51,19 @@ describe('position strategy', () => {
     const { winner, distribution } = decideFromPosition({ e2e4: { probability: 0.7 }, d2d4: { probability: 0.9 } }, candidates);
     expect(winner.san).toBe('d4');
     expect(distribution.g1f3).toBe(0);
+  });
+});
+
+describe('tactical strategy', () => {
+  it('puts computed facts in every option and lists pieces under attack', () => {
+    // 1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6: White to move, Qxf7# is available and the queen on h5 is attacked by the knight.
+    const chess = new Chess('r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4');
+    const candidates = listCandidates(chess);
+    const { state, questions } = buildTacticalRequest(chess, candidates);
+    expect(questions.bestMove.criteria.h5f7).toBe(
+      'Qxf7#: queen from h5 to f7, captures black pawn, delivers checkmate. wins 1 in material',
+    );
+    expect(questions.bestMove.criteria.h5h4).toContain('material even');
+    expect(state.position.piecesUnderAttack).toBe('queen on h5 can be taken for +9; pawn on e4 can be taken for +1');
   });
 });

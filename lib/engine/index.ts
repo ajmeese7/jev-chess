@@ -3,6 +3,7 @@ import { listCandidates } from './candidates';
 import { askJev, booleanAnswers, expectAnswer } from './jev';
 import { buildChoiceRequest, decideFromChoice } from './strategies/choice';
 import { buildPositionRequest, decideFromPosition } from './strategies/position';
+import { buildTacticalRequest } from './strategies/tactical';
 import type { Candidate, MoveDecision, StrategyId } from './types';
 
 export class IllegalMoveError extends Error {
@@ -55,8 +56,9 @@ export async function chooseMove(sans: string[], strategy: StrategyId): Promise<
 }
 
 async function runStrategy(chess: Chess, candidates: Candidate[], strategy: StrategyId) {
-  if (strategy === 'choice') {
-    const { state, questions } = buildChoiceRequest(chess, candidates);
+  if (strategy === 'choice' || strategy === 'tactical') {
+    const build = strategy === 'choice' ? buildChoiceRequest : buildTacticalRequest;
+    const { state, questions } = build(chess, candidates);
     const result = await askJev(state, questions);
     return { ...decideFromChoice(expectAnswer(result.answers, 'bestMove', 'choice'), candidates), usage: result.usage };
   }

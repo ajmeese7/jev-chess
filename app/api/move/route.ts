@@ -1,6 +1,6 @@
 import { GameOverError, IllegalMoveError, chooseMove } from '@/lib/engine';
 import { JEV_REQUESTS_PER_MINUTE, JevRateLimitError, retryAfterSeconds } from '@/lib/engine/jev';
-import { isStrategyId, type StrategyId } from '@/lib/engine/types';
+import { STRATEGY_IDS, isStrategyId, type StrategyId } from '@/lib/engine/types';
 import { checkRateLimit, clientIp } from '@/lib/rate-limit';
 
 const MAX_PLIES = 600;
@@ -16,7 +16,7 @@ function parseRequest(body: unknown): MoveRequest | string {
   if (!moves.every((m) => typeof m === 'string' && m.length > 0 && m.length <= MAX_SAN_LENGTH)) {
     return 'Every entry in "moves" must be a non-empty SAN string';
   }
-  if (!isStrategyId(strategy)) return '"strategy" must be "choice" or "position"';
+  if (!isStrategyId(strategy)) return `"strategy" must be one of ${STRATEGY_IDS.join(', ')}`;
   return { moves, strategy };
 }
 
