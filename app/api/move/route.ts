@@ -26,7 +26,15 @@ function retryLater(message: string, seconds: number, status: 429 | 503 = 429) {
 }
 
 export async function POST(request: Request) {
-  const verdict = await checkRateLimit(clientIp(request));
+  let verdict;
+  try {
+    verdict = await checkRateLimit(clientIp(request));
+  } catch (error) {
+    // Misconfiguration (no Upstash vars and no RATE_LIMIT=off). Say so instead of a bare 500.
+    console.error('[api/move] rate limiter unavailable', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    return Response.json({ error: `Server misconfigured: ${message}` }, { status: 500 });
+  }
   if (!verdict.allowed) return retryLater('Too many moves from your address, slow down', verdict.retryAfterSeconds);
 
   let body: unknown;
