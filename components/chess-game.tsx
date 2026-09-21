@@ -48,7 +48,7 @@ async function requestMove(moves: string[], strategy: StrategyId): Promise<MoveD
 export function ChessGame() {
   const [moves, setMoves] = useState<string[]>([]);
   const [humanColor, setHumanColor] = useState<SideName>('white');
-  const [strategy, setStrategy] = useState<StrategyId>('choice');
+  const [strategy, setStrategy] = useState<StrategyId>('tactical');
   const [engine, setEngine] = useState<EngineState>(IDLE_ENGINE);
   const [attempt, setAttempt] = useState(0);
   const requestedPly = useRef<number | null>(null);
