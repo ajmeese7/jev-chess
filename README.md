@@ -63,13 +63,19 @@ If `meese.dev` DNS is hosted on Vercel this is complete. Otherwise the command p
 
 `RATE_LIMIT=off` deploys without the per-IP limiter. The gateway's own cap (next section) already bounds how fast anyone can spend credits, so this is acceptable for a POC shared with a handful of people.
 
-To turn the per-IP limiter on, add an Upstash Redis database to the project:
+To turn the per-IP limiter on, the project needs an Upstash Redis database **connected to it**. Creating the database is not enough; connecting is what injects the env vars. Done 2026-09-21 as follows:
 
-1. Run `vercel integration add upstash` from this directory (or in the dashboard: project `jev-chess-engine`, **Storage** tab, **Create Database**, pick **Upstash for Redis**).
-2. Fill in the form. **Name**: any label, `jev-chess-ratelimit` is fine, it only appears in dashboards. **Primary region**: `us-east-1` (Vercel functions for this project run in `iad1`). **Plan**: Free.
-3. When asked which project and environments to connect it to, pick `jev-chess-engine`, all environments.
-4. Run `vercel env ls`. The integration injects either `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` or `KV_REST_API_URL` + `KV_REST_API_TOKEN`; the app reads both pairs (`lib/rate-limit.ts`). If neither pair shows up, copy the REST URL and token from the Upstash console and add them with `vercel env add`.
-5. `vercel env rm RATE_LIMIT production` then `vercel --prod --yes`.
+1. Create the database: `vercel integration add upstash` from this directory, or in the dashboard under **Storage**, **Create Database**, **Upstash for Redis**. **Name**: any label (`jev-chess-ratelimit` is the one in use). **Region**: `us-east-1`. **Plan**: Free.
+2. Connect it to the project. The creation flow does not always ask, so run this explicitly:
+
+   ```sh
+   vercel integration-resource connect jev-chess-ratelimit jev-chess-engine --yes
+   ```
+
+   Confirm with `vercel integration list --all`: the `Projects` column must say `jev-chess-engine`, not `–`.
+3. `vercel env ls` now shows `KV_REST_API_URL` and `KV_REST_API_TOKEN` (plus `KV_URL`, `REDIS_URL`, and a read-only token the app does not use). `lib/rate-limit.ts` reads the `KV_*` pair, or `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` if you configured Upstash by hand.
+4. `vercel env rm RATE_LIMIT production --yes` then `vercel --prod --yes`.
+5. Check it: fire 40 quick requests at `/api/move` from one machine and the last few must return 429 with a `Retry-After` header.
 
 The limit is 30 engine moves per IP per minute.
 
