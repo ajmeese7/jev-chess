@@ -19,7 +19,7 @@ export function buildTacticalRequest(chess: Chess, candidates: Candidate[]) {
 
   return {
     state: {
-      task: `You are playing ${side} in a game of chess. Choose the strongest legal move for ${side}. Each option lists exact facts computed by a chess engine: material won or lost after the best capture sequence on the target square, the opponent's most profitable capture in reply, whether the move allows checkmate in one, and whether it undoes a recent move, repeats a position, or develops a piece.`,
+      task: `You are playing ${side} in a game of chess. Choose the strongest legal move for ${side}. Each option lists exact facts computed by a chess engine: material won or lost after the best capture sequence on the target square, the opponent's most profitable capture in reply, whether the move forces or allows checkmate within two moves, and whether it undoes a recent move, repeats a position, or develops a piece.`,
       position: {
         ...position,
         piecesUnderAttack: describeThreats(piecesEnPrise(chess)),
@@ -31,7 +31,7 @@ export function buildTacticalRequest(chess: Chess, candidates: Candidate[]) {
     questions: {
       bestMove: {
         type: 'choice' as const,
-        instructions: `Which legal move is the strongest for ${side}? Priorities in order: deliver checkmate; never allow checkmate in one; do not lose material; win material; then make progress: develop an undeveloped piece, castle, gain space with a pawn, or create a threat. Never shuffle a piece back and forth and do not repeat positions unless you are losing.`,
+        instructions: `Which legal move is the strongest for ${side}? Priorities in order: deliver checkmate or force it in two; never allow checkmate in one or two; do not lose material; win material; then make progress: develop an undeveloped piece, castle, gain space with a pawn, or create a threat. Never shuffle a piece back and forth and do not repeat positions unless you are losing.`,
         criteria,
       },
     },

@@ -1,6 +1,6 @@
 import { Chess } from 'chess.js';
 import { describe, expect, it } from 'vitest';
-import { allowsMateIn1, bestCapture, describeFacts, exchangeValue, moveFacts, piecesEnPrise } from './tactics';
+import { allowsMateIn1, bestCapture, describeFacts, exchangeValue, hasForcedMateIn2, moveFacts, piecesEnPrise } from './tactics';
 
 function moveNamed(chess: Chess, san: string) {
   const move = chess.moves({ verbose: true }).find((m) => m.san === san);
@@ -62,6 +62,31 @@ describe('moveFacts', () => {
     const facts = moveFacts(moveNamed(chess, 'Qxf7#'));
     expect(facts.allowsMateIn1).toBe(false);
     expect(facts.replyCapture).toBeNull();
+  });
+});
+
+describe('mate in two', () => {
+  it('sees a forced mate in two starting with a check', () => {
+    // Back-rank net: 1. Ra8+ Rf8 (only reply) 2. Rxf8#.
+    const chess = new Chess('7k/6pp/5r2/8/8/8/8/RR4K1 w - - 0 1');
+    expect(hasForcedMateIn2(chess)).toBe(true);
+    const facts = moveFacts(chess.moves({ verbose: true }).find((m) => m.san === 'Ra8+')!);
+    expect(facts.forcesMateIn2).toBe(true);
+    expect(describeFacts(facts)).toContain('forces checkmate in two');
+  });
+
+  it('flags a move that allows a forced mate in two', () => {
+    // Black to move in the same net: Rf2 keeps the mate on, g6 gives the king air.
+    const chess = new Chess('7k/6pp/5r2/8/8/8/8/RR4K1 b - - 0 1');
+    const facts = moveFacts(chess.moves({ verbose: true }).find((m) => m.san === 'Rf2')!);
+    expect(facts.allowsMateIn2).toBe(true);
+    expect(describeFacts(facts)).toContain('allows a forced checkmate in two');
+    const safe = moveFacts(chess.moves({ verbose: true }).find((m) => m.san === 'g6')!);
+    expect(safe.allowsMateIn2).toBe(false);
+  });
+
+  it('does not report mate in two when there is none', () => {
+    expect(hasForcedMateIn2(new Chess())).toBe(false);
   });
 });
 
