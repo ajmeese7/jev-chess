@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { listCandidates } from '../candidates';
 import { buildChoiceRequest, decideFromChoice } from './choice';
 import { buildPositionRequest, decideFromPosition } from './position';
+import { POSITIONAL_WEIGHT, buildCompositeRequest, decideFromComposite, scoreKey } from './composite';
 import { buildTacticalRequest } from './tactical';
 
 const chess = new Chess();
@@ -65,5 +66,28 @@ describe('tactical strategy', () => {
     );
     expect(questions.bestMove.criteria.h5h4).toContain('material even');
     expect(state.position.piecesUnderAttack).toBe('queen on h5 can be taken for +9; pawn on e4 can be taken for +1');
+  });
+});
+
+describe('composite strategy', () => {
+  it('adds one positional score question per candidate and exposes the facts in state', () => {
+    const { questions, state } = buildCompositeRequest(chess, candidates);
+    expect(Object.keys(questions)).toHaveLength(21);
+    expect(questions[scoreKey('e2e4')].type).toBe('score');
+    expect(state.candidates.find((c) => c.option === 'e2e4')?.facts).toContain('e4: pawn from e2 to e4');
+  });
+
+  it('combines choice probability with weighted positional score', () => {
+    const { winner, distribution } = decideFromComposite(
+      {
+        bestMove: { type: 'choice', choice: 'e2e4', probabilities: { e2e4: 0.5, d2d4: 0.4 } },
+        [scoreKey('e2e4')]: { type: 'score', score: 0 },
+        [scoreKey('d2d4')]: { type: 'score', score: 3 },
+      },
+      candidates,
+    );
+    expect(distribution.e2e4).toBeCloseTo(0.5);
+    expect(distribution.d2d4).toBeCloseTo(0.4 + POSITIONAL_WEIGHT);
+    expect(winner.san).toBe('d4');
   });
 });

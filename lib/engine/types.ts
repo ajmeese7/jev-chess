@@ -1,7 +1,7 @@
 import type { ProgressFacts } from './progress';
 import type { MoveFacts } from './tactics';
 
-export const STRATEGY_IDS = ['choice', 'position', 'tactical'] as const;
+export const STRATEGY_IDS = ['choice', 'position', 'tactical', 'composite'] as const;
 
 export type StrategyId = (typeof STRATEGY_IDS)[number];
 
@@ -28,8 +28,9 @@ export type MoveDecision = {
   strategy: StrategyId;
   /**
    * Probability per candidate LAN as reported by Jev.
-   * For `choice` it is a distribution over moves (sums to ~1).
+   * For `choice` and `tactical` it is a distribution over moves (sums to ~1).
    * For `position` each value is an independent win probability for the resulting position.
+   * For `composite` it is choice probability plus weighted positional score (0 to 1.5).
    */
   distribution: Record<string, number>;
   candidates: Candidate[];

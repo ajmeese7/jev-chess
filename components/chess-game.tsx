@@ -12,6 +12,7 @@ const STRATEGY_LABELS: Record<StrategyId, string> = {
   choice: 'A: choose among legal moves',
   position: 'B: evaluate each resulting position',
   tactical: 'C: choose with computed tactics',
+  composite: 'D: tactics plus positional scores',
 };
 
 type EngineState = {

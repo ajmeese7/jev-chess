@@ -3,6 +3,7 @@ import { listCandidates } from './candidates';
 import { askJev, booleanAnswers, expectAnswer } from './jev';
 import { buildChoiceRequest, decideFromChoice } from './strategies/choice';
 import { buildPositionRequest, decideFromPosition } from './strategies/position';
+import { buildCompositeRequest, decideFromComposite } from './strategies/composite';
 import { buildTacticalRequest } from './strategies/tactical';
 import type { Candidate, MoveDecision, StrategyId } from './types';
 
@@ -61,6 +62,11 @@ async function runStrategy(chess: Chess, candidates: Candidate[], strategy: Stra
     const { state, questions } = build(chess, candidates);
     const result = await askJev(state, questions);
     return { ...decideFromChoice(expectAnswer(result.answers, 'bestMove', 'choice'), candidates), usage: result.usage };
+  }
+  if (strategy === 'composite') {
+    const { state, questions } = buildCompositeRequest(chess, candidates);
+    const result = await askJev(state, questions);
+    return { ...decideFromComposite(result.answers, candidates), usage: result.usage };
   }
   const { state, questions } = buildPositionRequest(chess, candidates);
   const result = await askJev(state, questions);

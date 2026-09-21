@@ -1,6 +1,13 @@
-import type { MoveDecision } from '@/lib/engine/types';
+import type { MoveDecision, StrategyId } from '@/lib/engine/types';
 
 const TOP_N = 8;
+
+const SCORE_LABELS: Record<StrategyId, string> = {
+  choice: 'P(best move)',
+  tactical: 'P(best move)',
+  position: 'P(win after move)',
+  composite: 'P(best move) + positional',
+};
 
 export function ThinkingPanel({ decision }: { decision: MoveDecision }) {
   const ranked = decision.candidates
@@ -8,7 +15,7 @@ export function ThinkingPanel({ decision }: { decision: MoveDecision }) {
     .sort((a, b) => b.probability - a.probability)
     .slice(0, TOP_N);
   const max = ranked[0]?.probability || 1;
-  const label = decision.strategy === 'choice' ? 'P(best move)' : 'P(win after move)';
+  const label = SCORE_LABELS[decision.strategy];
 
   return (
     <section className="flex flex-col gap-2">
