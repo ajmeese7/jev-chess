@@ -19,6 +19,11 @@
   }
 }
 
+/* Native controls (buttons, inputs, any future select) follow the page theme instead of defaulting to light. */
+:root {
+  color-scheme: light dark;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

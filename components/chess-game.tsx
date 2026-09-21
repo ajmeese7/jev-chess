@@ -130,20 +130,26 @@ export function ChessGame() {
           </button>
         </div>
 
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="text-zinc-500">Jev strategy (applies to the next move)</span>
-          <select
-            className="rounded border bg-transparent px-2 py-1"
-            value={strategy}
-            onChange={(event) => setStrategy(event.target.value as StrategyId)}
-          >
+        <fieldset className="flex flex-col gap-1 text-sm">
+          <legend className="mb-1 text-zinc-500">Jev strategy (applies to the next move)</legend>
+          <div className="flex flex-wrap gap-2">
             {STRATEGY_IDS.map((id) => (
-              <option key={id} value={id}>
+              <button
+                key={id}
+                type="button"
+                aria-pressed={strategy === id}
+                onClick={() => setStrategy(id)}
+                className={`rounded border px-3 py-1 ${
+                  strategy === id
+                    ? 'border-emerald-500 bg-emerald-500 text-white'
+                    : 'border-zinc-400 text-zinc-600 hover:border-zinc-600 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-400'
+                }`}
+              >
                 {STRATEGY_LABELS[id]}
-              </option>
+              </button>
             ))}
-          </select>
-        </label>
+          </div>
+        </fieldset>
 
         <p className="text-sm font-medium">{statusText(status, engine, isHumanTurn)}</p>
         {engine.error && (
