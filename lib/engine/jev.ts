@@ -91,10 +91,11 @@ export async function askJev(state: JevState, questions: Record<string, JevQuest
   };
 }
 
-/** Seconds to wait before retrying if `error` is transient (rate limit or gateway 5xx), otherwise null. */
+/** Seconds to wait before retrying if `error` is transient (rate limit, gateway 5xx, or a stalled request), otherwise null. */
 export function retryAfterSeconds(error: unknown): number | null {
   if (error instanceof JevRateLimitError) return error.retryAfterSeconds;
   if (error instanceof JevRequestError && error.isRetryable) return SERVER_ERROR_RETRY_SECONDS;
+  if (error instanceof DOMException && error.name === 'TimeoutError') return SERVER_ERROR_RETRY_SECONDS;
   return null;
 }
 
