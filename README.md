@@ -4,14 +4,36 @@ A chess engine where every move is chosen by [Jev](https://vercel.com/ai-gateway
 
 ## How it decides
 
-Two strategies, switchable per move in the UI. Both are a single round trip to Jev.
+Four strategies, switchable per move in the UI. Each is a single round trip to Jev.
 
-- **A: choice over legal moves** (`lib/engine/strategies/choice.ts`). One `choice` question whose options are the legal moves, described in prose ("Nxe5: knight from f3 to e5, captures black pawn"). Jev returns a distribution over moves and we play the argmax. Roughly 2k input tokens per move.
-- **B: evaluate each resulting position** (`lib/engine/strategies/position.ts`). Every legal move is played on a scratch board, the resulting positions all go into one state, and one `boolean` question per candidate asks "will the mover win from here?". We play the max. Roughly 4k to 8k input tokens per move.
+- **A: choice over legal moves** (`lib/engine/strategies/choice.ts`). One `choice` question whose options are the legal moves described in prose. Jev returns a distribution and we play the argmax. Roughly 2k input tokens per move.
+- **B: evaluate each resulting position** (`strategies/position.ts`). Every legal move is played on a scratch board, the resulting positions all go into one state, and one `boolean` per candidate asks "will the mover win from here?". Roughly 14k tokens per move.
+- **C: tactical** (`strategies/tactical.ts`). Strategy A, but every option carries facts computed in code (`lib/engine/tactics.ts`, `lib/engine/progress.ts`): the static exchange value on the target square, the opponent's best capture in reply, whether the move allows mate in one, whether it undoes the mover's recent move, repeats a position, or develops a piece. The state adds the mover's pieces under attack, undeveloped pieces, castling status, and plies since the last capture or pawn move. Jev still makes the choice. Roughly 3k tokens per move.
+- **D: composite** (`strategies/composite.ts`). Strategy C plus one `score` question per candidate on positional improvement, combined as `P(choice) + POSITIONAL_WEIGHT * score`. TypeSafe's composite scoring pattern.
 
 Only exception to "Jev decides everything": when there is exactly one legal move we skip the call, because there is nothing to decide.
 
-Board representation sent to Jev: ASCII board, FEN, a piece list per side ("king e1, queen d1, ..."), material count, whether the mover is in check, and the numbered move history.
+## Benchmark
+
+```sh
+pnpm bench --a jev:tactical --b stockfish:0@1 --games 10 --label my-run
+```
+
+Players are `jev:<strategy>`, `stockfish:<skill>@<depth>` (the `stockfish` npm WASM build, skill 0 to 20), or `random`. Colors alternate each game; one JSON record per game goes to `bench/results/<label>.jsonl`. Jev calls are paced to the gateway cap, so 10 games take 30 to 90 minutes.
+
+Results against Stockfish skill 0 at depth 1 (10 games each, from strategy's point of view):
+
+| Strategy | W | D | L | Avg plies | Notes |
+| --- | --- | --- | --- | --- | --- |
+| A choice | 0 | 2 | 8 | 39 | Gives away queens for pawns, walks into 4-move mates |
+| C tactical (exchange facts only) | 0 | 4 | 6 | 90 | Material blunders gone; shuffles one piece for 10+ moves |
+| C tactical + progress facts | 2 | 0 | 8 | 71 | First wins; oscillations down from ~10 to ~4 per game; losses end in 2-move mating nets |
+| C tactical + mate-in-two facts | 4 | 0 | 5 | 117 (+1 unfinished) | Best so far; roughly even with the opponent |
+| D composite (C + positional scores) | 1 | 2 | 6 | 85 (+1 unfinished) | 5 to 6k tokens per move, many more gateway 503s, one stalemate in a won ending. Not better than C |
+
+Ten games is enough to see qualitative changes (blunder classes disappearing) but not to rank configurations within a couple of wins of each other. For a ranking, run 30 or more games per configuration; the harness appends per game, so rerunning with the same `--label` resumes.
+
+What did not help: fine-tuning is not available for Jev (same weights for every account), and distilling Jev's chess into a smaller model would only reproduce its mistakes. TypeSafe's own guidance (state, criteria, composite scoring) is what strategies C and D implement.
 
 ## Run locally
 
