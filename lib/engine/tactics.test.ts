@@ -85,6 +85,14 @@ describe('mate in two', () => {
     expect(safe.allowsMateIn2).toBe(false);
   });
 
+  it('flags a stalemating move', () => {
+    // King a8 against Kc6 and a queen: Qb6 leaves the king no move and no check.
+    const chess = new Chess('k7/8/2K5/8/8/8/8/1Q6 w - - 0 1');
+    const facts = moveFacts(chess.moves({ verbose: true }).find((m) => m.san === 'Qb6')!);
+    expect(facts.stalemates).toBe(true);
+    expect(describeFacts(facts)).toContain('stalemates');
+  });
+
   it('does not report mate in two when there is none', () => {
     expect(hasForcedMateIn2(new Chess())).toBe(false);
   });

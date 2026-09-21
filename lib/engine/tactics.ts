@@ -18,6 +18,8 @@ export type MoveFacts = {
   allowsMateIn2: boolean;
   /** This move is a check after which every reply allows mate in one. */
   forcesMateIn2: boolean;
+  /** The opponent has no legal move and is not in check: an immediate draw. */
+  stalemates: boolean;
 };
 
 function opponentOf(color: Color): Color {
@@ -106,6 +108,7 @@ export function moveFacts(move: Move): MoveFacts {
     allowsMateIn1: mateIn1,
     allowsMateIn2: !mated && !mateIn1 && hasForcedMateIn2(after),
     forcesMateIn2: givesCheck && !mateIn1 && everyReplyAllowsMate(after),
+    stalemates: after.isStalemate(),
   };
 }
 
@@ -141,6 +144,7 @@ export function describeFacts(facts: MoveFacts): string {
   if (facts.replyCapture) {
     parts.push(`then the opponent can take the ${facts.replyCapture.piece} on ${facts.replyCapture.square} for +${facts.replyCapture.gain}`);
   }
+  if (facts.stalemates) parts.push('stalemates the opponent, immediate draw');
   if (facts.forcesMateIn2) parts.push('forces checkmate in two');
   if (facts.allowsMateIn1) parts.push('allows checkmate in one');
   if (facts.allowsMateIn2) parts.push('allows a forced checkmate in two');
