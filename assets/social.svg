@@ -94,7 +94,7 @@
 <text x="1151.0" y="200.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#18181b" stroke="#a1a1aa" stroke-width="2">&#9823;</text>
 <text x="827.0" y="524.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#ffffff">&#9814;</text>
 <text x="1205.0" y="146.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#18181b" stroke="#a1a1aa" stroke-width="2">&#9820;</text>
-<rect x="796" y="100" width="440" height="440" fill="none" stroke="#3f3f46" stroke-width="4" rx="6"/><g><rect x="1041.0" y="216" width="112" height="42" rx="6" fill="#18181b" stroke="#10b981" stroke-width="2"/><text x="1097.0" y="246" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="30" font-weight="700" text-anchor="middle" fill="#34d399">0.62</text></g><text x="140" y="262" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="116" font-weight="700" fill="#ffffff">Jev Chess</text>
-<text x="140" y="340" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="38" fill="#a1a1aa">No search. No eval.</text>
-<text x="140" y="392" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="38" fill="#a1a1aa">Jev picks every move.</text>
+<rect x="796" y="100" width="440" height="440" fill="none" stroke="#3f3f46" stroke-width="4" rx="6"/><g><rect x="1041.0" y="216" width="112" height="42" rx="6" fill="#18181b" stroke="#10b981" stroke-width="2"/><text x="1097.0" y="246" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="30" font-weight="700" text-anchor="middle" fill="#34d399">0.62</text></g><text x="100" y="262" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="116" font-weight="700" fill="#ffffff">Jev Chess</text>
+<text x="100" y="340" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="38" fill="#a1a1aa">No search. No eval.</text>
+<text x="100" y="392" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="38" fill="#a1a1aa">Jev picks every move.</text>
 </svg>
