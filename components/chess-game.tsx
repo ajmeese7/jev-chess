@@ -109,7 +109,7 @@ export function ChessGame() {
 
   return (
     <div className="flex w-full max-w-5xl flex-col gap-6 md:flex-row">
-      <div className="w-full md:w-[480px]">
+      <div className="w-full self-start md:w-[480px]">
         <Chessboard
           options={{
             position: chess.fen(),
