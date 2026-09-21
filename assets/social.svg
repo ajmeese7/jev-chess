@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+<defs>
+  <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#0f0f11" stop-opacity="1"/>
+    <stop offset="0.5" stop-color="#0f0f11" stop-opacity="0.85"/>
+    <stop offset="1" stop-color="#0f0f11" stop-opacity="0"/>
+  </linearGradient>
+  <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+    <stop offset="0" stop-color="#10b981" stop-opacity="0.55"/>
+    <stop offset="1" stop-color="#10b981" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+<rect width="1280" height="640" fill="#0f0f11"/>
+<rect x="800" y="104" width="54" height="54" fill="#3f3f46"/>
+<rect x="854" y="104" width="54" height="54" fill="#27272a"/>
+<rect x="908" y="104" width="54" height="54" fill="#3f3f46"/>
+<rect x="962" y="104" width="54" height="54" fill="#27272a"/>
+<rect x="1016" y="104" width="54" height="54" fill="#3f3f46"/>
+<rect x="1070" y="104" width="54" height="54" fill="#27272a"/>
+<rect x="1124" y="104" width="54" height="54" fill="#3f3f46"/>
+<rect x="1178" y="104" width="54" height="54" fill="#27272a"/>
+<rect x="800" y="158" width="54" height="54" fill="#27272a"/>
+<rect x="854" y="158" width="54" height="54" fill="#3f3f46"/>
+<rect x="908" y="158" width="54" height="54" fill="#27272a"/>
+<rect x="962" y="158" width="54" height="54" fill="#3f3f46"/>
+<rect x="1016" y="158" width="54" height="54" fill="#27272a"/>
+<rect x="1070" y="158" width="54" height="54" fill="#3f3f46"/>
+<rect x="1124" y="158" width="54" height="54" fill="#27272a"/>
+<rect x="1178" y="158" width="54" height="54" fill="#3f3f46"/>
+<rect x="800" y="212" width="54" height="54" fill="#3f3f46"/>
+<rect x="854" y="212" width="54" height="54" fill="#27272a"/>
+<rect x="908" y="212" width="54" height="54" fill="#3f3f46"/>
+<rect x="962" y="212" width="54" height="54" fill="#27272a"/>
+<rect x="1016" y="212" width="54" height="54" fill="#3f3f46"/>
+<rect x="1070" y="212" width="54" height="54" fill="#27272a"/>
+<rect x="1124" y="212" width="54" height="54" fill="#3f3f46"/>
+<rect x="1178" y="212" width="54" height="54" fill="#27272a"/>
+<rect x="800" y="266" width="54" height="54" fill="#27272a"/>
+<rect x="854" y="266" width="54" height="54" fill="#3f3f46"/>
+<rect x="908" y="266" width="54" height="54" fill="#27272a"/>
+<rect x="962" y="266" width="54" height="54" fill="#3f3f46"/>
+<rect x="1016" y="266" width="54" height="54" fill="#27272a"/>
+<rect x="1070" y="266" width="54" height="54" fill="#3f3f46"/>
+<rect x="1124" y="266" width="54" height="54" fill="#27272a"/>
+<rect x="1178" y="266" width="54" height="54" fill="#3f3f46"/>
+<rect x="800" y="320" width="54" height="54" fill="#3f3f46"/>
+<rect x="854" y="320" width="54" height="54" fill="#27272a"/>
+<rect x="908" y="320" width="54" height="54" fill="#3f3f46"/>
+<rect x="962" y="320" width="54" height="54" fill="#27272a"/>
+<rect x="1016" y="320" width="54" height="54" fill="#3f3f46"/>
+<rect x="1070" y="320" width="54" height="54" fill="#27272a"/>
+<rect x="1124" y="320" width="54" height="54" fill="#3f3f46"/>
+<rect x="1178" y="320" width="54" height="54" fill="#27272a"/>
+<rect x="800" y="374" width="54" height="54" fill="#27272a"/>
+<rect x="854" y="374" width="54" height="54" fill="#3f3f46"/>
+<rect x="908" y="374" width="54" height="54" fill="#27272a"/>
+<rect x="962" y="374" width="54" height="54" fill="#3f3f46"/>
+<rect x="1016" y="374" width="54" height="54" fill="#27272a"/>
+<rect x="1070" y="374" width="54" height="54" fill="#3f3f46"/>
+<rect x="1124" y="374" width="54" height="54" fill="#27272a"/>
+<rect x="1178" y="374" width="54" height="54" fill="#3f3f46"/>
+<rect x="800" y="428" width="54" height="54" fill="#3f3f46"/>
+<rect x="854" y="428" width="54" height="54" fill="#27272a"/>
+<rect x="908" y="428" width="54" height="54" fill="#3f3f46"/>
+<rect x="962" y="428" width="54" height="54" fill="#27272a"/>
+<rect x="1016" y="428" width="54" height="54" fill="#3f3f46"/>
+<rect x="1070" y="428" width="54" height="54" fill="#27272a"/>
+<rect x="1124" y="428" width="54" height="54" fill="#3f3f46"/>
+<rect x="1178" y="428" width="54" height="54" fill="#27272a"/>
+<rect x="800" y="482" width="54" height="54" fill="#27272a"/>
+<rect x="854" y="482" width="54" height="54" fill="#3f3f46"/>
+<rect x="908" y="482" width="54" height="54" fill="#27272a"/>
+<rect x="962" y="482" width="54" height="54" fill="#3f3f46"/>
+<rect x="1016" y="482" width="54" height="54" fill="#27272a"/>
+<rect x="1070" y="482" width="54" height="54" fill="#3f3f46"/>
+<rect x="1124" y="482" width="54" height="54" fill="#27272a"/>
+<rect x="1178" y="482" width="54" height="54" fill="#3f3f46"/>
+<rect x="1070" y="266" width="54" height="54" fill="#10b981" fill-opacity="0.61"/>
+<rect x="1070" y="374" width="54" height="54" fill="#10b981" fill-opacity="0.38"/>
+<rect x="854" y="266" width="54" height="54" fill="#10b981" fill-opacity="0.29"/>
+<rect x="908" y="212" width="54" height="54" fill="#10b981" fill-opacity="0.24"/>
+<rect x="1016" y="212" width="54" height="54" fill="#10b981" fill-opacity="0.22"/>
+<rect x="854" y="374" width="54" height="54" fill="#10b981" fill-opacity="0.20"/>
+<rect x="908" y="428" width="54" height="54" fill="#10b981" fill-opacity="0.18"/>
+<rect x="1016" y="428" width="54" height="54" fill="#10b981" fill-opacity="0.17"/>
+<rect x="1073" y="269" width="48" height="48" fill="none" stroke="#ffffff" stroke-width="4" rx="4"/>
+<text x="989.0" y="362.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#ffffff">&#9816;</text>
+<text x="1043.0" y="146.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#18181b" stroke="#a1a1aa" stroke-width="2">&#9818;</text>
+<text x="1043.0" y="524.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#ffffff">&#9812;</text>
+<text x="1097.0" y="308.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#18181b" stroke="#a1a1aa" stroke-width="2">&#9823;</text>
+<text x="935.0" y="470.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#ffffff">&#9817;</text>
+<text x="1151.0" y="470.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#ffffff">&#9817;</text>
+<text x="881.0" y="200.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#18181b" stroke="#a1a1aa" stroke-width="2">&#9823;</text>
+<text x="1151.0" y="200.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#18181b" stroke="#a1a1aa" stroke-width="2">&#9823;</text>
+<text x="827.0" y="524.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#ffffff">&#9814;</text>
+<text x="1205.0" y="146.12" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="45" text-anchor="middle" fill="#18181b" stroke="#a1a1aa" stroke-width="2">&#9820;</text>
+<rect x="796" y="100" width="440" height="440" fill="none" stroke="#3f3f46" stroke-width="4" rx="6"/><g><rect x="1041.0" y="216" width="112" height="42" rx="6" fill="#18181b" stroke="#10b981" stroke-width="2"/><text x="1097.0" y="246" font-family="DejaVu Sans Mono, Menlo, Consolas, monospace" font-size="30" font-weight="700" text-anchor="middle" fill="#34d399">0.62</text></g><text x="140" y="262" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="116" font-weight="700" fill="#ffffff">Jev Chess</text>
+<text x="140" y="340" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="38" fill="#a1a1aa">No search. No eval.</text>
+<text x="140" y="392" font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="38" fill="#a1a1aa">Jev picks every move.</text>
+</svg>
