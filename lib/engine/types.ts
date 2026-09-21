@@ -1,4 +1,6 @@
-export const STRATEGY_IDS = ['choice', 'position'] as const;
+import type { MoveFacts } from './tactics';
+
+export const STRATEGY_IDS = ['choice', 'position', 'tactical'] as const;
 
 export type StrategyId = (typeof STRATEGY_IDS)[number];
 
@@ -15,6 +17,7 @@ export type Candidate = {
   description: string;
   /** FEN after the move is played. */
   after: string;
+  facts: MoveFacts;
 };
 
 export type MoveDecision = {

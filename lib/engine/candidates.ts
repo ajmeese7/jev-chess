@@ -1,5 +1,6 @@
 import type { Chess, Move } from 'chess.js';
 import { pieceName, sideName } from './position-text';
+import { moveFacts } from './tactics';
 import type { Candidate } from './types';
 
 export function describeMove(move: Move): string {
@@ -21,6 +22,7 @@ export function listCandidates(chess: Chess): Candidate[] {
     san: move.san,
     description: describeMove(move),
     after: move.after,
+    facts: moveFacts(move),
   }));
 }
 
