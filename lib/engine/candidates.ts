@@ -1,5 +1,6 @@
 import type { Chess, Move } from 'chess.js';
 import { pieceName, sideName } from './position-text';
+import { progressFacts } from './progress';
 import { moveFacts } from './tactics';
 import type { Candidate } from './types';
 
@@ -23,6 +24,7 @@ export function listCandidates(chess: Chess): Candidate[] {
     description: describeMove(move),
     after: move.after,
     facts: moveFacts(move),
+    progress: progressFacts(chess, move),
   }));
 }
 

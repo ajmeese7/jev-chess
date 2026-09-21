@@ -1,3 +1,4 @@
+import type { ProgressFacts } from './progress';
 import type { MoveFacts } from './tactics';
 
 export const STRATEGY_IDS = ['choice', 'position', 'tactical'] as const;
@@ -18,6 +19,7 @@ export type Candidate = {
   /** FEN after the move is played. */
   after: string;
   facts: MoveFacts;
+  progress: ProgressFacts;
 };
 
 export type MoveDecision = {
