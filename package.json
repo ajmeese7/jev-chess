@@ -10,7 +10,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "smoke": "node --env-file=.env.local --import tsx scripts/smoke.mts",
-    "selfplay": "node --env-file=.env.local --import tsx scripts/selfplay.mts"
+    "bench": "node --env-file=.env.local --import tsx bench/run.mts"
   },
   "dependencies": {
     "@upstash/ratelimit": "^2.1.0",
@@ -28,6 +28,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.5",
+    "stockfish": "^19.0.0",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
     "typescript": "^5",
