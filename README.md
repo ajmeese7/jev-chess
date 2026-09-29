@@ -1,124 +1,70 @@
 # Jev Chess
 
-A chess engine where every move is chosen by [Jev](https://vercel.com/ai-gateway/models/jev), TypeSafe AI's yes/no evaluation model, called through Vercel AI Gateway's `/v1/evaluate` endpoint. The AI SDK is not used: its `experimental_evaluate` rejects valid Jev responses when rounded probabilities tie (see `lib/engine/jev.ts`). There is no search and no hand-written evaluation. `chess.js` enforces the rules, Jev picks the move.
+A chess engine that asks [Jev](https://vercel.com/ai-gateway/models/jev) to choose each move through Vercel AI Gateway. `chess.js` enforces the rules; Jev evaluates the options. The engine does not search ahead, so expect mistakes.
 
-## How it decides
+## Strategies
 
-Four strategies, switchable per move in the UI. Each is a single round trip to Jev.
+Choose a strategy in the game interface:
 
-- **A: choice over legal moves** (`lib/engine/strategies/choice.ts`). One `choice` question whose options are the legal moves described in prose. Jev returns a distribution and we play the argmax. Roughly 2k input tokens per move.
-- **B: evaluate each resulting position** (`strategies/position.ts`). Every legal move is played on a scratch board, the resulting positions all go into one state, and one `boolean` per candidate asks "will the mover win from here?". Roughly 14k tokens per move.
-- **C: tactical** (`strategies/tactical.ts`). Strategy A, but every option carries facts computed in code (`lib/engine/tactics.ts`, `lib/engine/progress.ts`): the static exchange value on the target square, the opponent's best capture in reply, whether the move allows mate in one, whether it undoes the mover's recent move, repeats a position, or develops a piece. The state adds the mover's pieces under attack, undeveloped pieces, castling status, and plies since the last capture or pawn move. Jev still makes the choice. Roughly 3k tokens per move.
-- **D: composite** (`strategies/composite.ts`). Strategy C plus one `score` question per candidate on positional improvement, combined as `P(choice) + POSITIONAL_WEIGHT * score`. TypeSafe's composite scoring pattern.
+- **Choice:** Jev selects from the legal moves.
+- **Position:** Jev evaluates the position after each legal move.
+- **Tactical:** Jev selects from legal moves described with computed tactical and progress facts.
+- **Composite:** combines the tactical choice with positional scores.
 
-Only exception to "Jev decides everything": when there is exactly one legal move we skip the call, because there is nothing to decide.
-
-## Benchmark
-
-```sh
-pnpm bench --a jev:tactical --b stockfish:0@1 --games 10 --label my-run
-```
-
-Players are `jev:<strategy>`, `stockfish:<skill>@<depth>` (the `stockfish` npm WASM build, skill 0 to 20), or `random`. Colors alternate each game; one JSON record per game goes to `bench/results/<label>.jsonl`. Jev calls are paced to the gateway cap, so 10 games take 30 to 90 minutes.
-
-Results against Stockfish skill 0 at depth 1 (10 games each, from strategy's point of view):
-
-| Strategy | W | D | L | Avg plies | Notes |
-| --- | --- | --- | --- | --- | --- |
-| A choice | 0 | 2 | 8 | 39 | Gives away queens for pawns, walks into 4-move mates |
-| C tactical (exchange facts only) | 0 | 4 | 6 | 90 | Material blunders gone; shuffles one piece for 10+ moves |
-| C tactical + progress facts | 2 | 0 | 8 | 71 | First wins; oscillations down from ~10 to ~4 per game; losses end in 2-move mating nets |
-| C tactical + mate-in-two facts | 4 | 0 | 5 | 117 (+1 unfinished) | Best so far; roughly even with the opponent |
-| D composite (C + positional scores) | 1 | 2 | 6 | 85 (+1 unfinished) | 5 to 6k tokens per move, many more gateway 503s, one stalemate in a won ending. Not better than C |
-
-Ten games is enough to see qualitative changes (blunder classes disappearing) but not to rank configurations within a couple of wins of each other. For a ranking, run 30 or more games per configuration; the harness appends per game, so rerunning with the same `--label` resumes.
-
-What did not help: fine-tuning is not available for Jev (same weights for every account), and distilling Jev's chess into a smaller model would only reproduce its mistakes. TypeSafe's own guidance (state, criteria, composite scoring) is what strategies C and D implement.
+Each move uses one gateway request, except when only one legal move is available.
 
 ## Run locally
 
+Requirements: Node.js and pnpm.
+
 ```sh
 pnpm install
-cp .env.example .env.local   # add AI_GATEWAY_API_KEY=vck_...
+cp .env.example .env.local
+```
+
+Add an AI Gateway key to `.env.local`:
+
+```dotenv
+AI_GATEWAY_API_KEY=vck_...
+```
+
+Start the app:
+
+```sh
 pnpm dev
 ```
 
-`pnpm smoke` runs both strategies once on a busy middlegame and prints what Jev picked, the latency, and the token count. Run this first after setting the key.
-
-`pnpm selfplay --white choice --black random --games 3` plays full games and prints results, plies, tokens, and latency. Players are `choice`, `position`, or `random`. It paces itself to the gateway's 30 requests/minute, so a full game takes a few minutes.
-
-`pnpm test`, `pnpm lint`, `pnpm typecheck`, `pnpm build`.
-
-## Deploy
-
-Verified 2026-09-21. Everything below is run from this directory. The live site is https://jev-chess-engine.vercel.app (Vercel project `jev-chess-engine` in team `aaron-meeses-projects`).
-
-### First deploy
+`pnpm smoke` makes a live gateway request for each strategy. Other available commands:
 
 ```sh
-vercel login                                                             # once per machine, opens a browser
-vercel link --yes --project jev-chess-engine --scope aaron-meeses-projects
-printf '%s' "$AI_GATEWAY_API_KEY" | vercel env add AI_GATEWAY_API_KEY production   # or paste the vck_ key interactively
-printf 'off' | vercel env add RATE_LIMIT production                      # see "Rate limiting" below
-vercel --prod --yes
+pnpm test
+pnpm lint
+pnpm typecheck
+pnpm build
+pnpm bench --a jev:tactical --b stockfish:0@1 --games 10 --label my-run
 ```
 
-`vercel link` writes `.vercel/project.json` (gitignored). Do not run a bare `vercel link` and accept whatever project it suggests: on 2026-09-21 it picked the existing `ajmeese7` project, and a green build would have replaced that site with this one. Always pass `--project jev-chess-engine`. Check with `cat .vercel/project.json` if in doubt.
+The benchmark writes one JSON record per game to `bench/results/<label>.jsonl`.
 
-The pnpm 12 install on Vercel fails with `ERR_PNPM_IGNORED_BUILDS` unless `esbuild` (pulled in by `tsx`) is allowed to run its build script. That is set in `pnpm-workspace.yaml` (`allowBuilds: esbuild: true`) and needs no action.
+## Rate limits
 
-### Every later deploy
+The app can apply a per-IP limit with Upstash Redis. Gateway limits are separate and shared by requests using the same AI Gateway key. The app reports gateway rate-limit responses and retries after the delay supplied by the gateway. Changing the app's per-IP limit does not raise the gateway limit; ask Vercel whether the shared limit for your account can be raised.
 
-```sh
-vercel --prod --yes
+## Project layout
+
+```text
+app/api/move/route.ts       Move API
+components/chess-game.tsx   Board, controls, and move requests
+components/thinking-panel.tsx  Jev's probabilities for the last move
+lib/engine/                 Position descriptions, strategies, and gateway client
+lib/rate-limit.ts           Optional Upstash per-IP limit
+scripts/smoke.mts           Live gateway check
+bench/                      Strategy benchmark harness
 ```
 
-### Subdomain
+## References
 
-```sh
-vercel domains add chess.meese.dev jev-chess-engine
-```
-
-If `meese.dev` DNS is hosted on Vercel this is complete. Otherwise the command prints the record to create at the DNS host: a CNAME for `chess` pointing to `cname.vercel-dns.com`. Certificates are issued automatically once the record resolves.
-
-### Rate limiting
-
-`RATE_LIMIT=off` deploys without the per-IP limiter. The gateway's own cap (next section) already bounds how fast anyone can spend credits, so this is acceptable for a POC shared with a handful of people.
-
-To turn the per-IP limiter on, the project needs an Upstash Redis database **connected to it**. Creating the database is not enough; connecting is what injects the env vars. Done 2026-09-21 as follows:
-
-1. Create the database: `vercel integration add upstash` from this directory, or in the dashboard under **Storage**, **Create Database**, **Upstash for Redis**. **Name**: any label (`jev-chess-ratelimit` is the one in use). **Region**: `us-east-1`. **Plan**: Free.
-2. Connect it to the project. The creation flow does not always ask, so run this explicitly:
-
-   ```sh
-   vercel integration-resource connect jev-chess-ratelimit jev-chess-engine --yes
-   ```
-
-   Confirm with `vercel integration list --all`: the `Projects` column must say `jev-chess-engine`, not `–`.
-3. `vercel env ls` now shows `KV_REST_API_URL` and `KV_REST_API_TOKEN` (plus `KV_URL`, `REDIS_URL`, and a read-only token the app does not use). `lib/rate-limit.ts` reads the `KV_*` pair, or `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` if you configured Upstash by hand.
-4. `vercel env rm RATE_LIMIT production --yes` then `vercel --prod --yes`.
-5. Check it: fire 40 quick requests at `/api/move` from one machine and the last few must return 429 with a `Retry-After` header.
-
-The limit is 30 engine moves per IP per minute.
-
-## Gateway rate limit (the real constraint)
-
-Measured 2026-09-20: the gateway caps this key at **30 requests per minute** and 250k tokens per minute for Jev (`x-ratelimit-limit-requests: 30`). The 429 body says "upstream provider is experiencing high demand", which is misleading; it is a per-key cap. One player never notices, but the 30 moves/min are shared by everyone on the site, so expect waits above roughly 5 to 10 concurrent players.
-
-How the app handles it: the engine makes no SDK retries (a retry would hold a serverless function open for the ~20 s `Retry-After`), the API returns 429 with `Retry-After`, and the client shows a countdown and retries on its own. The self-play harness paces itself to stay under the cap. If Vercel raises the limit for the key, bump `JEV_REQUESTS_PER_MINUTE` in `lib/engine/jev.ts`.
-
-## Cost
-
-Jev bills input tokens only, $0.042 per million on the gateway. At a few thousand tokens per move, $5 covers on the order of a thousand full games. The gateway ran a free launch promo through 2026-09-25.
-
-## Layout
-
-```
-app/api/move/route.ts        POST { moves: SAN[], strategy } -> MoveDecision
-components/chess-game.tsx    board, controls, engine request loop
-components/thinking-panel.tsx  Jev's probability bars for the last move
-lib/engine/                  position text, candidates, strategies, Jev call
-lib/rate-limit.ts            Upstash sliding window per IP
-scripts/smoke.mts             one-shot live check
-scripts/selfplay.mts          strategy comparison harness
-```
+Cool similar projects I have found:
+- https://github.com/dperezcabrera/system-one-chess
+- https://dev.to/maximsaplin/typesafe-jev-played-chess-and-landed-next-to-reasoning-models-28ga
+  - https://github.com/maxim-saplin/llm_chess
