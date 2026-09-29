@@ -1,5 +1,5 @@
 import { GameOverError, IllegalMoveError, chooseMove } from '@/lib/engine';
-import { JEV_REQUESTS_PER_MINUTE, JevRateLimitError, retryAfterSeconds } from '@/lib/engine/jev';
+import { JevRateLimitError, retryAfterSeconds } from '@/lib/engine/jev';
 import { STRATEGY_IDS, isStrategyId, type StrategyId } from '@/lib/engine/types';
 import { checkRateLimit, clientIp } from '@/lib/rate-limit';
 
@@ -55,7 +55,16 @@ export async function POST(request: Request) {
     }
     const seconds = retryAfterSeconds(error);
     if (seconds !== null && error instanceof JevRateLimitError) {
-      return retryLater(`Jev is at its rate limit (${JEV_REQUESTS_PER_MINUTE} moves per minute, shared by everyone playing)`, seconds);
+      const requestLimit = error.rateLimitHeaders['x-ratelimit-limit-requests'];
+      console.warn('[api/move] gateway returned 429', {
+        retryAfterSeconds: seconds,
+        rateLimitHeaders: error.rateLimitHeaders,
+        responseBody: error.responseBody.slice(0, 300),
+      });
+      const message = requestLimit
+        ? `Jev's shared request limit has been reached (${requestLimit} requests per minute)`
+        : 'The AI service is temporarily rate-limited or busy';
+      return retryLater(message, seconds);
     }
     if (seconds !== null) {
       console.warn('[api/move] transient gateway failure', error);

@@ -155,15 +155,15 @@ export function ChessGame() {
 
         <p className="text-sm font-medium">{statusText(status, engine, isHumanTurn)}</p>
         {engine.error && (
-          <p className="rounded border border-red-400 bg-red-50 p-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
-            {engine.error}
-            {engine.retryIn !== null ? ` Retrying in ${engine.retryIn}s.` : ''}
+          <div role="alert" className="rounded border border-red-400 bg-red-50 p-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+            <p>{engine.error}</p>
+            {engine.retryIn !== null && <p className="mt-1">Retrying in {engine.retryIn}s.</p>}
             {engine.retryIn === null && !status.over && (
-              <button className="ml-2 underline" onClick={() => setAttempt((n) => n + 1)}>
+              <button className="mt-1 underline" onClick={() => setAttempt((n) => n + 1)}>
                 Retry
               </button>
             )}
-          </p>
+          </div>
         )}
 
         {engine.lastDecision && <ThinkingPanel decision={engine.lastDecision} />}

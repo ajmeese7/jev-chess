@@ -9,7 +9,7 @@ const GATEWAY_URL = 'https://ai-gateway.vercel.sh/v1/evaluate';
 
 export const JEV_MODEL_ID = 'typesafe-ai/jev';
 
-/** Measured 2026-09-20 from x-ratelimit-limit-requests on a 429; the cap is per key, shared by every player. */
+/** Observed gateway request cap; it is per key and shared by every player. */
 export const JEV_REQUESTS_PER_MINUTE = 30;
 
 /** Steady-state latency is under 3 s; a stalled request once took 60 s, which is unplayable. */
@@ -40,7 +40,11 @@ export type JevUsage = { inputTokens: number | undefined; outputTokens: number |
 export type JevResult = { answers: Record<string, JevAnswer>; usage: JevUsage };
 
 export class JevRateLimitError extends Error {
-  constructor(readonly retryAfterSeconds: number) {
+  constructor(
+    readonly retryAfterSeconds: number,
+    readonly responseBody: string,
+    readonly rateLimitHeaders: Record<string, string>,
+  ) {
     super(`Jev is rate limited, retry after ${retryAfterSeconds}s`);
     this.name = 'JevRateLimitError';
   }
@@ -77,7 +81,16 @@ export async function askJev(state: JevState, questions: Record<string, JevQuest
 
   if (response.status === 429) {
     const seconds = Number(response.headers.get('retry-after'));
-    throw new JevRateLimitError(Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds) : DEFAULT_RETRY_AFTER_SECONDS);
+    const responseBody = await response.text();
+    const rateLimitHeaders: Record<string, string> = {};
+    response.headers.forEach((value, name) => {
+      if (name.startsWith('x-ratelimit-') || name.startsWith('ratelimit-')) rateLimitHeaders[name] = value;
+    });
+    throw new JevRateLimitError(
+      Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds) : DEFAULT_RETRY_AFTER_SECONDS,
+      responseBody,
+      rateLimitHeaders,
+    );
   }
   if (!response.ok) throw new JevRequestError(response.status, await response.text());
 
